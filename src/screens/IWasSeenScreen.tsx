@@ -13,6 +13,7 @@ import {
   Button,
   Footer,
 } from '../components/styled';
+import { submitOutfitDescription, getCurrentUser } from '../services/backendService';
 
 interface OutfitOption {
   id: string;
@@ -52,6 +53,7 @@ const IWasSeenScreen: React.FC = () => {
   const [selectedClothing, setSelectedClothing] = useState<string[]>([]);
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOptionSelect = (option: OutfitOption, category: 'clothing' | 'accessories' | 'activity') => {
     switch (category) {
@@ -79,14 +81,35 @@ const IWasSeenScreen: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement Firebase save functionality
-    console.log('Submitting outfit description:', {
-      clothing: selectedClothing,
-      accessories: selectedAccessories,
-      activity: selectedActivity,
-    });
-    navigate('/home');
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // For "I Was Seen", we'll create a simulated match scenario
+      // In a real app, this would be triggered by someone else describing you
+      getCurrentUser(); // Get current user for session management
+      
+      // Simulate that someone noticed you and described you
+      // This creates a match scenario for testing
+      const isMatch = await submitOutfitDescription(
+        'user1', // Simulate Sarah noticing you
+        selectedClothing,
+        selectedAccessories,
+        selectedActivity
+      );
+      
+      if (isMatch) {
+        navigate('/match-found');
+      } else {
+        navigate('/home');
+        alert('Description submitted! We\'ll notify you if someone notices you too.');
+      }
+    } catch (error) {
+      console.error('Error submitting description:', error);
+      alert('Error submitting description. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderSection = (title: string, options: OutfitOption[], selected: string[]) => (
@@ -134,8 +157,12 @@ const IWasSeenScreen: React.FC = () => {
         </Content>
 
         <Footer>
-          <Button onClick={handleSubmit} style={{ width: '100%' }}>
-            Submit Description
+          <Button 
+            onClick={handleSubmit} 
+            style={{ width: '100%' }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Description'}
           </Button>
         </Footer>
       </Container>

@@ -13,6 +13,7 @@ import {
   Button,
   Footer,
 } from '../components/styled';
+import { submitOutfitDescription } from '../services/backendService';
 
 interface OutfitOption {
   id: string;
@@ -53,6 +54,7 @@ const WhatWasSheWearingScreen: React.FC = () => {
   const [selectedClothing, setSelectedClothing] = useState<string[]>([]);
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOptionSelect = (option: OutfitOption, category: 'clothing' | 'accessories' | 'activity') => {
     switch (category) {
@@ -80,14 +82,33 @@ const WhatWasSheWearingScreen: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement Firebase save functionality
-    console.log('Submitting outfit description for user:', targetUserId, {
-      clothing: selectedClothing,
-      accessories: selectedAccessories,
-      activity: selectedActivity,
-    });
-    navigate('/match-found');
+  const handleSubmit = async () => {
+    if (!targetUserId) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Use real backend service
+      const isMatch = await submitOutfitDescription(
+        targetUserId,
+        selectedClothing,
+        selectedAccessories,
+        selectedActivity
+      );
+      
+      if (isMatch) {
+        navigate('/match-found');
+      } else {
+        // No match yet, show waiting screen
+        navigate('/home');
+        alert('Description submitted! We\'ll notify you if they notice you too.');
+      }
+    } catch (error) {
+      console.error('Error submitting description:', error);
+      alert('Error submitting description. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderSection = (title: string, options: OutfitOption[], selected: string[]) => (
@@ -135,8 +156,12 @@ const WhatWasSheWearingScreen: React.FC = () => {
         </Content>
 
         <Footer>
-          <Button onClick={handleSubmit} style={{ width: '100%' }}>
-            Submit Description
+          <Button 
+            onClick={handleSubmit} 
+            style={{ width: '100%' }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Description'}
           </Button>
         </Footer>
       </Container>

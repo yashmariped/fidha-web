@@ -11,18 +11,11 @@ import {
   Description,
   Button,
 } from '../components/styled';
-
-interface BLEDevice {
-  id: string;
-  name: string;
-  rssi: number;
-  timestamp: string;
-  userId?: string;
-}
+import { getNearbyUsers, User } from '../services/backendService';
 
 const FindSomeoneScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [nearbyDevices, setNearbyDevices] = useState<BLEDevice[]>([]);
+  const [nearbyUsers, setNearbyUsers] = useState<User[]>([]);
   const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
@@ -33,37 +26,18 @@ const FindSomeoneScreen: React.FC = () => {
     try {
       setIsScanning(true);
       
-      // Simulate BLE scanning for web demo
-      setTimeout(() => {
-        const mockDevices: BLEDevice[] = [
-          {
-            id: '1',
-            name: 'Sarah\'s iPhone',
-            rssi: -45,
-            timestamp: new Date().toISOString(),
-            userId: 'user1',
-          },
-          {
-            id: '2',
-            name: 'Alex\'s Samsung',
-            rssi: -52,
-            timestamp: new Date().toISOString(),
-            userId: 'user2',
-          },
-        ];
-        setNearbyDevices(mockDevices);
-        setIsScanning(false);
-      }, 3000);
+      // Use real backend service
+      const users = await getNearbyUsers();
+      setNearbyUsers(users);
+      setIsScanning(false);
     } catch (error) {
       console.error('Error starting scan:', error);
       setIsScanning(false);
     }
   };
 
-  const handleDeviceSelect = (device: BLEDevice) => {
-    if (device.userId) {
-      navigate(`/what-was-she-wearing/${device.userId}`);
-    }
+  const handleUserSelect = (user: User) => {
+    navigate(`/what-was-she-wearing/${user.id}`);
   };
 
   return (
@@ -93,7 +67,7 @@ const FindSomeoneScreen: React.FC = () => {
                 Scanning for nearby users...
               </Description>
             </div>
-          ) : nearbyDevices.length === 0 ? (
+          ) : nearbyUsers.length === 0 ? (
             <div style={{ textAlign: 'center' }}>
               <Description>
                 No nearby users found
@@ -105,28 +79,28 @@ const FindSomeoneScreen: React.FC = () => {
           ) : (
             <div style={{ width: '100%' }}>
               <Description>
-                Found {nearbyDevices.length} nearby user(s)
+                Found {nearbyUsers.length} nearby user(s)
               </Description>
-              {nearbyDevices.map((device) => (
+              {nearbyUsers.map((user) => (
                 <Card 
-                  key={device.id} 
+                  key={user.id} 
                   style={{ cursor: 'pointer' }}
-                  onClick={() => handleDeviceSelect(device)}
+                  onClick={() => handleUserSelect(user)}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <h3 style={{ color: 'white', margin: '0 0 4px 0' }}>
-                        {device.name}
+                        {user.name}
                       </h3>
                       <p style={{ color: '#E0C3FC', margin: 0 }}>
-                        {Math.abs(device.rssi)}m away
+                        {user.isOnline ? 'Online now' : 'Recently seen'}
                       </p>
                     </div>
                     <div style={{ 
                       width: '12px', 
                       height: '12px', 
                       borderRadius: '50%', 
-                      backgroundColor: '#00FF9D' 
+                      backgroundColor: user.isOnline ? '#00FF9D' : '#FFD700' 
                     }} />
                   </div>
                 </Card>

@@ -14,58 +14,65 @@ import {
   MessageBubble,
   ChatInputContainer,
 } from '../components/styled';
-
-interface Message {
-  id: string;
-  content: string;
-  timestamp: string;
-  isSender: boolean;
-}
+import { getChatMessages, sendMessage, ChatMessage, getCurrentUser } from '../services/backendService';
 
 const ChatScreen: React.FC = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: 'You both noticed each other. Say what you couldn\'t then.',
-      timestamp: new Date().toISOString(),
-      isSender: false,
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const currentUser = getCurrentUser();
+
+  // For demo purposes, use a fixed chat ID
+  const chatId = 'demo_chat_1';
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  const loadMessages = async () => {
+    try {
+      setIsLoading(true);
+      const chatMessages = await getChatMessages(chatId);
+      setMessages(chatMessages);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message.trim().length === 0) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      content: message.trim(),
-      timestamp: new Date().toISOString(),
-      isSender: true,
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
+    const trimmedMessage = message.trim();
     setMessage('');
 
-    // Simulate response after 2 seconds
-    setTimeout(() => {
-      const response: Message = {
-        id: (Date.now() + 1).toString(),
-        content: 'Thanks for reaching out! I noticed you too.',
-        timestamp: new Date().toISOString(),
-        isSender: false,
-      };
-      setMessages((prev) => [...prev, response]);
-    }, 2000);
+    try {
+      // Send message through backend service
+      const newMessage = await sendMessage(chatId, trimmedMessage);
+      
+      // Add message to local state
+      setMessages(prev => [...prev, newMessage]);
+      
+      // The backend service will automatically add a response after 2-5 seconds
+      // We'll poll for new messages
+      setTimeout(() => {
+        loadMessages();
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Error sending message. Please try again.');
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -74,6 +81,41 @@ const ChatScreen: React.FC = () => {
       handleSend();
     }
   };
+
+  if (isLoading) {
+    return (
+      <GradientBackground>
+        <Container>
+          <Header>
+            <BackButton onClick={() => navigate('/home')}>
+              ← Back
+            </BackButton>
+            <Title style={{ fontSize: '24px' }}>Chat</Title>
+            <div style={{ width: '50px' }} />
+          </Header>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '50vh' 
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                border: '4px solid rgba(255,255,255,0.3)', 
+                borderTop: '4px solid white', 
+                borderRadius: '50%', 
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 16px'
+              }} />
+              <p style={{ color: 'white' }}>Loading chat...</p>
+            </div>
+          </div>
+        </Container>
+      </GradientBackground>
+    );
+  }
 
   return (
     <GradientBackground>
@@ -89,7 +131,7 @@ const ChatScreen: React.FC = () => {
         <ChatContainer>
           <MessagesContainer>
             {messages.map((msg) => (
-              <MessageBubble key={msg.id} isSender={msg.isSender}>
+              <MessageBubble key={msg.id} isSender={msg.senderId === currentUser.id}>
                 <Card className="message-card">
                   <div style={{ color: 'white', marginBottom: '4px' }}>
                     {msg.content}
@@ -138,6 +180,15 @@ const ChatScreen: React.FC = () => {
           </Button>
         </ChatInputContainer>
       </Container>
+      
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </GradientBackground>
   );
 };

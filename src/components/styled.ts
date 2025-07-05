@@ -324,6 +324,7 @@ export const Grid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: ${SPACING.m};
   margin: ${SPACING.l} 0;
+  width: 100%;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -332,6 +333,10 @@ export const Grid = styled.div`
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 `;
 
@@ -346,10 +351,16 @@ export const GridItem = styled.div<{ selected?: boolean }>`
   font-size: ${SIZES.body2};
   font-weight: ${props => props.selected ? 'bold' : 'normal'};
   color: ${COLORS.text};
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   @media (min-width: 768px) {
     padding: ${SPACING.l};
     font-size: ${SIZES.body1};
+    min-height: 100px;
   }
 
   &:hover {
