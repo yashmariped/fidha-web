@@ -128,7 +128,7 @@ const HistoryScreen: React.FC = () => {
               <Description>No moments yet</Description>
             </div>
           ) : (
-            <div style={{ width: '100%', maxWidth: '600px' }}>
+            <div style={{ width: '100%' }}>
               {moments.map((moment) => (
                 <Card key={moment.id}>
                   <div style={{ 

@@ -103,7 +103,7 @@ const FindSomeoneScreen: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div style={{ width: '100%', maxWidth: '600px' }}>
+            <div style={{ width: '100%' }}>
               <Description>
                 Found {nearbyDevices.length} nearby user(s)
               </Description>

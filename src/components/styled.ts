@@ -12,11 +12,20 @@ export const GradientBackground = styled.div`
 // Container
 export const Container = styled.div`
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: ${SPACING.l};
   flex: 1;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    padding: ${SPACING.m};
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 1400px;
+  }
 `;
 
 // Content
@@ -28,6 +37,11 @@ export const Content = styled.div`
   align-items: center;
   text-align: center;
   padding: ${SPACING.xl} 0;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding: ${SPACING.l} 0;
+  }
 `;
 
 // Typography
@@ -37,6 +51,14 @@ export const Title = styled.h1`
   color: ${COLORS.text};
   margin-bottom: ${SPACING.s};
   font-family: ${FONTS.bold};
+
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 32px;
+  }
 `;
 
 export const Subtitle = styled.h2`
@@ -45,6 +67,14 @@ export const Subtitle = styled.h2`
   color: ${COLORS.text};
   margin-bottom: ${SPACING.m};
   font-family: ${FONTS.bold};
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
 `;
 
 export const Tagline = styled.p`
@@ -52,6 +82,10 @@ export const Tagline = styled.p`
   color: ${COLORS.text};
   margin-bottom: ${SPACING.l};
   font-family: ${FONTS.regular};
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 export const Description = styled.p`
@@ -60,6 +94,10 @@ export const Description = styled.p`
   line-height: 1.6;
   margin-bottom: ${SPACING.l};
   font-family: ${FONTS.regular};
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
 // Buttons
@@ -77,6 +115,18 @@ export const Button = styled.button<{ variant?: 'primary' | 'outline' }>`
   min-width: 200px;
   margin: ${SPACING.s} 0;
 
+  @media (max-width: 768px) {
+    min-width: 180px;
+    padding: ${SPACING.m} ${SPACING.l};
+    font-size: 16px;
+  }
+
+  @media (max-width: 480px) {
+    min-width: 160px;
+    padding: ${SPACING.s} ${SPACING.m};
+    font-size: 14px;
+  }
+
   &:hover {
     transform: translateY(-2px);
     ${SHADOWS.medium}
@@ -92,8 +142,16 @@ export const ButtonGroup = styled.div`
   flex-direction: column;
   gap: ${SPACING.m};
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
   margin: 0 auto;
+
+  @media (min-width: 768px) {
+    max-width: 500px;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 600px;
+  }
 `;
 
 // Cards
@@ -105,6 +163,10 @@ export const Card = styled.div`
   margin-bottom: ${SPACING.m};
   backdrop-filter: blur(10px);
   ${SHADOWS.light}
+
+  @media (max-width: 768px) {
+    padding: ${SPACING.m};
+  }
 `;
 
 // Header
@@ -114,6 +176,10 @@ export const Header = styled.header`
   align-items: center;
   padding: ${SPACING.l};
   border-bottom: 1px solid ${COLORS.primaryLight};
+
+  @media (max-width: 768px) {
+    padding: ${SPACING.m};
+  }
 `;
 
 export const BackButton = styled.button`
@@ -126,6 +192,10 @@ export const BackButton = styled.button`
   cursor: pointer;
   padding: ${SPACING.s};
   transition: opacity ${ANIMATION.fast};
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 
   &:hover {
     opacity: 0.8;
@@ -144,10 +214,28 @@ export const HeartIcon = styled.div`
   margin: ${SPACING.l} 0;
   position: relative;
 
+  @media (min-width: 768px) {
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (min-width: 1024px) {
+    width: 240px;
+    height: 240px;
+  }
+
   &::before {
     content: '♥';
     font-size: 80px;
     color: ${COLORS.text};
+
+    @media (min-width: 768px) {
+      font-size: 100px;
+    }
+
+    @media (min-width: 1024px) {
+      font-size: 120px;
+    }
   }
 `;
 
@@ -159,6 +247,11 @@ export const AccentDot = styled.div`
   background: ${COLORS.primaryLight};
   opacity: 0.7;
   margin: 0 ${SPACING.s};
+
+  @media (min-width: 768px) {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 export const IconRow = styled.div`
@@ -179,6 +272,11 @@ export const Input = styled.input`
   font-family: ${FONTS.regular};
   width: 100%;
   margin-bottom: ${SPACING.m};
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: ${SPACING.s} ${SPACING.m};
+  }
 
   &::placeholder {
     color: ${COLORS.textSecondary};
@@ -204,6 +302,11 @@ export const TextArea = styled.textarea`
   resize: vertical;
   margin-bottom: ${SPACING.m};
 
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: ${SPACING.s} ${SPACING.m};
+  }
+
   &::placeholder {
     color: ${COLORS.textSecondary};
   }
@@ -221,6 +324,15 @@ export const Grid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: ${SPACING.m};
   margin: ${SPACING.l} 0;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: ${SPACING.l};
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
 `;
 
 export const GridItem = styled.div<{ selected?: boolean }>`
@@ -235,6 +347,11 @@ export const GridItem = styled.div<{ selected?: boolean }>`
   font-weight: ${props => props.selected ? 'bold' : 'normal'};
   color: ${COLORS.text};
 
+  @media (min-width: 768px) {
+    padding: ${SPACING.l};
+    font-size: ${SIZES.body1};
+  }
+
   &:hover {
     background: ${COLORS.primaryLight};
     transform: translateY(-2px);
@@ -247,12 +364,99 @@ export const Footer = styled.footer`
   padding: ${SPACING.l};
   border-top: 1px solid ${COLORS.primaryLight};
   text-align: center;
+
+  @media (max-width: 768px) {
+    padding: ${SPACING.m};
+  }
 `;
 
 // Responsive
 export const ResponsiveContainer = styled.div`
+  width: 100%;
+  max-width: 100%;
+
   @media (max-width: 768px) {
     padding: ${SPACING.m};
+  }
+`;
+
+// Chat specific components
+export const ChatContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  width: 100%;
+  max-width: 100%;
+
+  @media (min-width: 768px) {
+    height: calc(100vh - 180px);
+  }
+
+  @media (min-width: 1024px) {
+    height: calc(100vh - 160px);
+  }
+`;
+
+export const MessagesContainer = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 32px;
+    gap: 24px;
+  }
+`;
+
+export const MessageBubble = styled.div<{ isSender: boolean }>`
+  display: flex;
+  justify-content: ${props => props.isSender ? 'flex-end' : 'flex-start'};
+  margin-bottom: 8px;
+  width: 100%;
+
+  .message-card {
+    max-width: 70%;
+    background-color: ${props => props.isSender ? '#A084E8' : 'rgba(255, 255, 255, 0.2)'};
+    border-radius: ${props => props.isSender ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+    padding: 12px 16px;
+    margin: 0;
+
+    @media (min-width: 768px) {
+      max-width: 60%;
+      padding: 16px 20px;
+    }
+
+    @media (min-width: 1024px) {
+      max-width: 50%;
+      padding: 20px 24px;
+    }
+  }
+`;
+
+export const ChatInputContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 16px 24px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    padding: 20px 32px;
+    gap: 12px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 24px 40px;
+    gap: 16px;
   }
 `;
 

@@ -6,11 +6,13 @@ import {
   Header,
   BackButton,
   Title,
-  Content,
   Card,
   Input,
   Button,
-  Footer,
+  ChatContainer,
+  MessagesContainer,
+  MessageBubble,
+  ChatInputContainer,
 } from '../components/styled';
 
 interface Message {
@@ -84,40 +86,11 @@ const ChatScreen: React.FC = () => {
           <div style={{ width: '50px' }} />
         </Header>
 
-        <Content style={{ 
-          flexDirection: 'column', 
-          justifyContent: 'flex-start',
-          alignItems: 'stretch',
-          padding: '0',
-          height: 'calc(100vh - 200px)',
-          overflow: 'hidden'
-        }}>
-          <div style={{ 
-            flex: 1, 
-            overflowY: 'auto', 
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
+        <ChatContainer>
+          <MessagesContainer>
             {messages.map((msg) => (
-              <div
-                key={msg.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: msg.isSender ? 'flex-end' : 'flex-start',
-                  marginBottom: '8px',
-                }}
-              >
-                <Card
-                  style={{
-                    maxWidth: '70%',
-                    backgroundColor: msg.isSender ? '#A084E8' : 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: msg.isSender ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    padding: '12px 16px',
-                    margin: 0,
-                  }}
-                >
+              <MessageBubble key={msg.id} isSender={msg.isSender}>
+                <Card className="message-card">
                   <div style={{ color: 'white', marginBottom: '4px' }}>
                     {msg.content}
                   </div>
@@ -132,18 +105,13 @@ const ChatScreen: React.FC = () => {
                     })}
                   </div>
                 </Card>
-              </div>
+              </MessageBubble>
             ))}
             <div ref={messagesEndRef} />
-          </div>
-        </Content>
+          </MessagesContainer>
+        </ChatContainer>
 
-        <Footer style={{ 
-          display: 'flex', 
-          gap: '8px',
-          alignItems: 'center',
-          padding: '16px 24px'
-        }}>
+        <ChatInputContainer>
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -168,7 +136,7 @@ const ChatScreen: React.FC = () => {
           >
             Send
           </Button>
-        </Footer>
+        </ChatInputContainer>
       </Container>
     </GradientBackground>
   );
