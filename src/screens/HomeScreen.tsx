@@ -19,24 +19,24 @@ const HomeScreen: React.FC = () => {
       <Container>
         <Content>
           <Title>Fidha</Title>
-          <Tagline>Connect with a glance</Tagline>
+          <Tagline>Start conversations that matter</Tagline>
           
           <ButtonGroup>
             <Button onClick={() => navigate('/find-someone')}>
-              Find Someone
+              Start a Conversation
             </Button>
             
             <Button onClick={() => navigate('/i-was-seen')}>
-              I Was Seen
+              I Was Noticed
             </Button>
             
             <Button variant="outline" onClick={() => navigate('/history')}>
-              History
+              My Conversations
             </Button>
           </ButtonGroup>
           
           <Description>
-            Discover connections through shared moments
+            Connect through shared moments and see where conversations lead
           </Description>
         </Content>
       </Container>

@@ -7,11 +7,8 @@ import {
   Title,
   Tagline,
   Description,
-  ButtonGroup,
   Button,
   HeartIcon,
-  IconRow,
-  AccentDot,
 } from '../components/styled';
 
 const WelcomeScreen: React.FC = () => {
@@ -21,28 +18,18 @@ const WelcomeScreen: React.FC = () => {
     <GradientBackground>
       <Container>
         <Content>
+          <HeartIcon>💬</HeartIcon>
           <Title>Fidha</Title>
-          <Tagline>Express true connection</Tagline>
-          
-          <IconRow>
-            <AccentDot />
-            <HeartIcon />
-            <AccentDot />
-          </IconRow>
-          
-          <Title style={{ fontSize: '32px', marginBottom: '12px' }}>
-            Connect with a glance
-          </Title>
+          <Tagline>Start conversations that matter</Tagline>
           
           <Description>
-            Start a search and find someone nearby who also felt a connection.
+            Notice someone interesting? Start a conversation without the awkwardness. 
+            Connect through shared moments and see where it leads.
           </Description>
           
-          <ButtonGroup>
-            <Button onClick={() => navigate('/home')}>
-              Start Searching
-            </Button>
-          </ButtonGroup>
+          <Button onClick={() => navigate('/home')}>
+            Get Started
+          </Button>
         </Content>
       </Container>
     </GradientBackground>

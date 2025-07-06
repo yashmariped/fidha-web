@@ -50,6 +50,14 @@ export interface Chat {
   lastMessage?: ChatMessage;
 }
 
+export interface Conversation {
+  id: string;
+  personName: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  isActive: boolean;
+}
+
 // Simulated database
 let users: User[] = [
   {
@@ -258,4 +266,25 @@ export const getUserChats = async (): Promise<Chat[]> => {
   return chats.filter(chat => 
     chat.user1Id === currentUser.id || chat.user2Id === currentUser.id
   );
+};
+
+// Get conversation history for history screen
+export const getConversationHistory = async (): Promise<Conversation[]> => {
+  const currentUser = getCurrentUser();
+  const userChats = chats.filter(chat => 
+    chat.user1Id === currentUser.id || chat.user2Id === currentUser.id
+  );
+  
+  return userChats.map(chat => {
+    const otherUserId = chat.user1Id === currentUser.id ? chat.user2Id : chat.user1Id;
+    const otherUser = users.find(u => u.id === otherUserId);
+    
+    return {
+      id: chat.id,
+      personName: otherUser?.name || 'Unknown Person',
+      lastMessage: chat.lastMessage?.content || 'No messages yet',
+      lastMessageTime: chat.lastMessage?.timestamp || chat.messages[0]?.timestamp || new Date().toISOString(),
+      isActive: otherUser?.isOnline || false,
+    };
+  });
 }; 

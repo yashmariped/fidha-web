@@ -149,10 +149,31 @@ This project is licensed under the MIT License.
 
 For support, email support@fidha.app or create an issue in this repository.
 
+## Current Status
+
+✅ **Demo Mode**: App works with simulated users for testing
+✅ **Firebase Ready**: Real-time backend integration ready
+✅ **Conversation Focus**: Reframed as conversation starter app
+✅ **Responsive Design**: Works on all devices
+
+## Next Steps
+
+To see real users instead of bots:
+
+1. **Set up Firebase** (5 minutes):
+   - Follow [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
+   - Create Firebase project
+   - Add your config to `.env` file
+
+2. **Share with friends**:
+   - Deploy to Vercel/Netlify
+   - Share the live URL
+   - Friends will see each other as real users
+
 ## Roadmap
 
-- [ ] Firebase integration for real-time data
-- [ ] BLE scanning simulation for web
+- [x] Firebase integration for real-time data
+- [x] BLE scanning simulation for web
 - [ ] Push notifications
 - [ ] User authentication
 - [ ] Profile management

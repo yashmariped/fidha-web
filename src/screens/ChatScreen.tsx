@@ -6,72 +6,80 @@ import {
   Header,
   BackButton,
   Title,
-  Card,
-  Input,
-  Button,
+  Content,
   ChatContainer,
-  MessagesContainer,
   MessageBubble,
   ChatInputContainer,
+  Input,
+  Button,
 } from '../components/styled';
-import { getChatMessages, sendMessage, ChatMessage, getCurrentUser } from '../services/backendService';
+import { getChatMessages, sendMessage, initializeUser, getCurrentUser } from '../services/firebaseService';
+
+interface Message {
+  id: string;
+  content: string;
+  timestamp: string;
+  isSender: boolean;
+}
+
+// For demo purposes, use a fixed chat ID
+const DEMO_CHAT_ID = 'demo_chat_1';
 
 const ChatScreen: React.FC = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const currentUser = getCurrentUser();
-
-  // For demo purposes, use a fixed chat ID
-  const chatId = 'demo_chat_1';
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadMessages();
+    const initAndLoadMessages = async () => {
+      try {
+        await initializeUser();
+        const chatMessages = await getChatMessages(DEMO_CHAT_ID);
+        const currentUser = await getCurrentUser();
+        
+        const formattedMessages: Message[] = chatMessages.map(msg => ({
+          id: msg.id,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          isSender: msg.senderId === currentUser?.id,
+        }));
+        
+        setMessages(formattedMessages);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        setIsLoading(false);
+      }
+    };
+    
+    initAndLoadMessages();
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const loadMessages = async () => {
-    try {
-      setIsLoading(true);
-      const chatMessages = await getChatMessages(chatId);
-      setMessages(chatMessages);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    } finally {
-      setIsLoading(false);
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messages]);
 
   const handleSend = async () => {
     if (message.trim().length === 0) return;
 
-    const trimmedMessage = message.trim();
-    setMessage('');
-
     try {
-      // Send message through backend service
-      const newMessage = await sendMessage(chatId, trimmedMessage);
+      const sentMessage = await sendMessage(DEMO_CHAT_ID, message.trim());
       
-      // Add message to local state
-      setMessages(prev => [...prev, newMessage]);
-      
-      // The backend service will automatically add a response after 2-5 seconds
-      // We'll poll for new messages
-      setTimeout(() => {
-        loadMessages();
-      }, 3000);
+      const newMessage: Message = {
+        id: sentMessage.id,
+        content: sentMessage.content,
+        timestamp: sentMessage.timestamp,
+        isSender: true,
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+      setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Error sending message. Please try again.');
     }
   };
 
@@ -82,41 +90,6 @@ const ChatScreen: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <GradientBackground>
-        <Container>
-          <Header>
-            <BackButton onClick={() => navigate('/home')}>
-              ← Back
-            </BackButton>
-            <Title style={{ fontSize: '24px' }}>Chat</Title>
-            <div style={{ width: '50px' }} />
-          </Header>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '50vh' 
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ 
-                width: '40px', 
-                height: '40px', 
-                border: '4px solid rgba(255,255,255,0.3)', 
-                borderTop: '4px solid white', 
-                borderRadius: '50%', 
-                animation: 'spin 1s linear infinite',
-                margin: '0 auto 16px'
-              }} />
-              <p style={{ color: 'white' }}>Loading chat...</p>
-            </div>
-          </div>
-        </Container>
-      </GradientBackground>
-    );
-  }
-
   return (
     <GradientBackground>
       <Container>
@@ -124,71 +97,52 @@ const ChatScreen: React.FC = () => {
           <BackButton onClick={() => navigate('/home')}>
             ← Back
           </BackButton>
-          <Title style={{ fontSize: '24px' }}>Chat</Title>
-          <div style={{ width: '50px' }} />
+          <Title>Conversation</Title>
         </Header>
-
-        <ChatContainer>
-          <MessagesContainer>
-            {messages.map((msg) => (
-              <MessageBubble key={msg.id} isSender={msg.senderId === currentUser.id}>
-                <Card className="message-card">
-                  <div style={{ color: 'white', marginBottom: '4px' }}>
+        
+        <Content>
+          {isLoading ? (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                border: '3px solid #E0C3FC', 
+                borderTop: '3px solid #7B4AE2', 
+                borderRadius: '50%', 
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 16px auto'
+              }} />
+              <p style={{ color: 'white' }}>Loading conversation...</p>
+            </div>
+          ) : (
+            <ChatContainer ref={chatContainerRef}>
+              {messages.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'white' }}>
+                  <p>No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((msg) => (
+                  <MessageBubble key={msg.id} isSender={msg.isSender}>
                     {msg.content}
-                  </div>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: '#E0C3FC', 
-                    textAlign: 'right' 
-                  }}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                </Card>
-              </MessageBubble>
-            ))}
-            <div ref={messagesEndRef} />
-          </MessagesContainer>
-        </ChatContainer>
-
-        <ChatInputContainer>
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type a message..."
-            style={{ 
-              flex: 1, 
-              margin: 0,
-              borderRadius: '20px',
-              padding: '12px 16px'
-            }}
-          />
-          <Button 
-            onClick={handleSend}
-            disabled={!message.trim()}
-            style={{ 
-              borderRadius: '20px',
-              padding: '12px 16px',
-              minWidth: 'auto',
-              opacity: message.trim() ? 1 : 0.5
-            }}
-          >
-            Send
-          </Button>
-        </ChatInputContainer>
+                  </MessageBubble>
+                ))
+              )}
+            </ChatContainer>
+          )}
+          
+          <ChatInputContainer>
+            <Input
+              placeholder="Type your message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <Button onClick={handleSend} disabled={!message.trim()}>
+              Send
+            </Button>
+          </ChatInputContainer>
+        </Content>
       </Container>
-      
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
     </GradientBackground>
   );
 };
